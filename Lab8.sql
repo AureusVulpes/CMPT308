@@ -58,4 +58,4 @@ CREATE TABLE Contracts(
 SELECT DISTINCT Contracts.DID FROM Contracts 
 	INNER JOIN People ON Contracts.DID=People.PID
 	LEFT JOIN People ON Contracts.AID=People.PID
-	WHERE Contracts.AID IN (SELECT PID FROM People WHERE Name = "SeanConnery");
+	WHERE Contracts.AID IN (SELECT PID FROM People WHERE name = "Sean Connery");
