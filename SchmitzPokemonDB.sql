@@ -644,6 +644,8 @@ INSERT INTO Party (pid, dexID, gender, nick, level, currentHP, maxHP, pokeball, 
 INSERT INTO Party (pid, dexID, gender, nick, level, currentHP, maxHP, pokeball, move1, move1PP, move2, move2PP, move3, move3PP, move4, move4PP, itemHeld, happiness, statuseffect)
 	VALUES (1, 0654, 'Female', 'Selkie', 100, 100, 100, 3, 1, 25, 12, 20, 13, 15, NULL, NULL, 7, 200, NULL);
 
+INSERT INTO Party (pid, dexID, gender, nick, level, currentHP, maxHP, pokeball, move1, move1PP, move2, move2PP, move3, move3PP, move4, move4PP, itemHeld, happiness, statuseffect)
+	VALUES (2, 0445, 'Male', 'Alan', 100, 100, 100, 4, 0, 25, 15, 20, 22, 15, 23, 10, NULL, 200, NULL);
 
 
 
