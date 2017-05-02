@@ -617,7 +617,7 @@ INSERT INTO Inventory (itemID, qty)
 	VALUES (2, 5);
 
 CREATE TABLE Party(
-  pid integer not null,
+  pid SERIAL,
   dexID integer not null references Pokemon(dexID),
   gender text,
   nick text,
@@ -639,23 +639,21 @@ CREATE TABLE Party(
   primary key(pid)
 );
 
-INSERT INTO Party (pid, dexID, gender, nick, level, currentHP, maxHP, pokeball, move1, move1PP, move2, move2PP, move3, move3PP, move4, move4PP, itemHeld, happiness, statuseffect)
-	VALUES (0, 0448, 'Female', 'Mya', 100, 100, 100, 3, 6, 20, 8, 30, 7, 10, 9, 15, NULL, 200, NULL);
-INSERT INTO Party (pid, dexID, gender, nick, level, currentHP, maxHP, pokeball, move1, move1PP, move2, move2PP, move3, move3PP, move4, move4PP, itemHeld, happiness, statuseffect)
-	VALUES (1, 0654, 'Female', 'Selkie', 100, 100, 100, 3, 1, 25, 12, 20, 13, 15, NULL, NULL, 7, 200, NULL);
-
-INSERT INTO Party (pid, dexID, gender, nick, level, currentHP, maxHP, pokeball, move1, move1PP, move2, move2PP, move3, move3PP, move4, move4PP, itemHeld, happiness, statuseffect)
-	VALUES (2, 0445, 'Male', 'Alan', 100, 100, 100, 4, 0, 25, 15, 20, 22, 15, 23, 10, NULL, 200, NULL);
+INSERT INTO Party (dexID, gender, nick, level, currentHP, maxHP, pokeball, move1, move1PP, move2, move2PP, move3, move3PP, move4, move4PP, itemHeld, happiness, statuseffect)
+	VALUES (0448, 'Female', 'Mya', 100, 100, 100, 3, 6, 20, 8, 30, 7, 10, 9, 15, NULL, 200, NULL);
+INSERT INTO Party (dexID, gender, nick, level, currentHP, maxHP, pokeball, move1, move1PP, move2, move2PP, move3, move3PP, move4, move4PP, itemHeld, happiness, statuseffect)
+	VALUES (0654, 'Female', 'Selkie', 100, 100, 100, 3, 1, 25, 12, 20, 13, 15, NULL, NULL, 7, 200, NULL);
+INSERT INTO Party (dexID, gender, nick, level, currentHP, maxHP, pokeball, move1, move1PP, move2, move2PP, move3, move3PP, move4, move4PP, itemHeld, happiness, statuseffect)
+	VALUES (0445, 'Male', 'Alan', 100, 100, 100, 4, 0, 25, 15, 20, 22, 15, 23, 10, NULL, 200, NULL);
 
 
 
 CREATE TABLE STORAGE(
-  bid integer not null,
+  bid SERIAL,
   dexID integer not null references Pokemon(dexID),
   gender text,
   nick text,
   level integer not null,
-  currentHP integer not null,
   maxHP integer not null,
   pokeball integer references Pokeballs(itemID),
   move1 integer references Moves(mID),
@@ -742,24 +740,46 @@ select potentialmates('Lucario');
 
 --transfer a pokemon to storage
 
-/*CREATE OR REPLACE FUNCTION transfer(partynum integer)
+CREATE OR REPLACE FUNCTION transfer(partynum integer)
 RETURNS void AS
 $$
 DECLARE
 	partynum integer :=$1;
+	a integer ;
+	b integer ;
+	c text;
+	d text;
+	e integer;
+	f integer;
+	g integer;
+	h integer;
+	i integer;
+	j integer;
+	k integer;
+	l integer;
+	m integer;
+	
 BEGIN
-	INSERT INTO Storage (bid, dexID, gender, nick, level, maxHP, pokeball, move1, move2, move3, move4, itemHeld, happiness)
-	SELECT (pid, dexID, gender, nick, level, maxHP, pokeball, move1, move2, move3, move4, itemHeld, happiness)
-	FROM Party
+--	INSERT INTO Storage (bid, dexID, gender, nick, level, maxHP, pokeball, move1, move2, move3, move4, itemHeld, happiness)
+--	SELECT (pid, dexID, gender, nick, level, maxHP, pokeball, move1, move2, move3, move4, itemHeld, happiness)
+--	FROM Party
+--	WHERE pid = partynum;
+	SELECT pid, dexID, gender, nick, level, maxHP, pokeball, move1, move2, move3, move4, itemHeld, happiness
+	INTO a, b, c, d, e, f, g, h, i, j, k, l, m FROM Party 
 	WHERE pid = partynum;
 
-	DELETE FROM Party
-	WHERE pid = partynum;
+	insert into storage (dexID, gender, nick, level, maxHP, pokeball, move1, move2, move3, move4, itemHeld, happiness)
+	values (b, c, d, e, f, g, h, i, j, k, l, m);
 
-COMMIT;	
+	DELETE FROM PARTY WHERE pid = partynum;
+
+
+--	DELETE FROM Party
+--	WHERE pid = partynum;
+
+	
 END;
 $$ LANGUAGE plpgsql;
-*/
 
 --select transfer(1);
 
@@ -768,21 +788,26 @@ $$ LANGUAGE plpgsql;
 /*** triggers**********
 ***********************/
 --automatically send a pokemon to storage if it is the 7th party member
-/*
 CREATE OR REPLACE FUNCTION oversizedParty() RETURNS TRIGGER AS
 $$
+DECLARE
+	a integer;
+	c integer; 
 BEGIN
-	IF SELECT COUNT(*) FROM Party >= 7
-	THEN
-		
-		
+	SELECT COUNT(*) INTO c FROM Party;
+	IF c > 6 THEN
+	SELECT MAX(Party.pid) INTO a FROM Party;
+	PERFORM transfer(a);
 	END IF;
 	RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
-*/
---without transfer function, this wont work. 
+CREATE TRIGGER osParty 
+	AFTER INSERT ON PARTY 
+	FOR EACH STATEMENT
+	EXECUTE PROCEDURE oversizedParty();
+
 
 --automatically evolve the pokemon if it achieves levelup requirements and is not holding an everstone
 
@@ -796,7 +821,7 @@ select pokemon.species, egggroups.groupname from pokemon join egggroupmembers on
 --shows all pokemon and their egg groups they are part of by name
 
 --roles
-create role admin;
+/*create role admin;
 grant all on all tables in schema public to admin;
 
 CREATE ROLE player;
@@ -804,7 +829,7 @@ REVOKE ALL ON ALL TABLES IN SCHEMA public FROM player;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO player;
 GRANT INSERT ON Inventory, Party, Storage TO player;
 GRANT UPDATE ON Inventory, Party, Storage TO player;
-
+*/
 --verify results--
 SELECT * FROM Pokemon ORDER BY dexID;
 SELECT * FROM Evolutions ORDER BY pID;
